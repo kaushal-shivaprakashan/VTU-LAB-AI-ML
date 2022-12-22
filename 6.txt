@@ -1,0 +1,55 @@
+import math
+import statistics as st
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+dataset = pd.read_csv("6.csv", header=None)
+print(dataset)
+X = dataset[[0, 1, 2, 3]].values.tolist()
+print(X)
+Y = dataset[4].values.tolist()
+print(Y)
+x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size = 0.10)
+print(x_train)
+print("Total Available Instances: ", len(X))
+print("Total Attributes: ", len(X[0]))
+print("Training Examples = {0}\nTesting Examples = {1}".format(len(x_train), len(x_test)))
+separated = {}
+for i in range(len(x_train)):
+    if y_train[i] not in separated:
+        separated[y_train[i]] = []
+    separated[y_train[i]].append(x_train[i])
+
+summary = {}
+for target_value, x_instances in separated.items():
+    summary[target_value] = [ (st.mean(attribute), st.stdev(attribute)) for attribute in zip(*x_instances) ]
+
+print(summary)
+correct = 0
+for instance in range(len(x_test)):
+    best_label = None
+    best_probability  = -1
+    probabilities = {}
+    
+    for target_value, mean_std in summary.items():
+        probabilities[target_value] = 1
+        
+        for j in range(len(mean_std)):
+            mean, std_dev = mean_std[j]
+            x = x_test[instance][j]
+            
+            # calculating probability using Normal Distribution Formula
+            exponent = math.exp(-(math.pow(x-mean,2)/float(2*math.pow(std_dev,2))))
+            result = (1/(std_dev * math.sqrt(2*math.pi))) * exponent
+            
+            probabilities[target_value] *= result
+        
+        if best_label is None or probabilities[target_value] > best_probability:
+            best_label = target_value
+            best_probability = probabilities[target_value]
+    
+    if best_label == y_test[instance]:
+        correct = correct + 1
+    
+accuracy = (correct/float(len(x_test))) * 100
+print("Accuracy is: ", accuracy)
