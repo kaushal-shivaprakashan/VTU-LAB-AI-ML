@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 
 
-data = pd.read_csv('samp.csv')
+data = pd.read_csv('6.csv')
 
 print(data.describe())
 
@@ -26,7 +26,7 @@ classifier = GaussianNB()
 classifier.fit(X_train, y_train)
 
 
-print("Accuracy is:",classifier.score(X_test, y_test))
+print("Accuracy of classifier  is:",classifier.score(X_test, y_test))
 
 
 
